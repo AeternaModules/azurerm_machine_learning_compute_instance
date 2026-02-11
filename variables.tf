@@ -28,8 +28,8 @@ EOT
     virtual_machine_size          = string
     authorization_type            = optional(string)
     description                   = optional(string)
-    local_auth_enabled            = optional(bool, true)
-    node_public_ip_enabled        = optional(bool, true)
+    local_auth_enabled            = optional(bool) # Default: true
+    node_public_ip_enabled        = optional(bool) # Default: true
     subnet_resource_id            = optional(string)
     tags                          = optional(map(string))
     assign_to_user = optional(object({
