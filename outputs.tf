@@ -1,3 +1,7 @@
+output "machine_learning_compute_instances_id" {
+  description = "Map of id values across all machine_learning_compute_instances, keyed the same as var.machine_learning_compute_instances"
+  value       = { for k, v in azurerm_machine_learning_compute_instance.machine_learning_compute_instances : k => v.id }
+}
 output "machine_learning_compute_instances_assign_to_user" {
   description = "Map of assign_to_user values across all machine_learning_compute_instances, keyed the same as var.machine_learning_compute_instances"
   value       = { for k, v in azurerm_machine_learning_compute_instance.machine_learning_compute_instances : k => v.assign_to_user }
