@@ -28,8 +28,8 @@ EOT
     virtual_machine_size          = string
     authorization_type            = optional(string)
     description                   = optional(string)
-    local_auth_enabled            = optional(bool) # Default: true
-    node_public_ip_enabled        = optional(bool) # Default: true
+    local_auth_enabled            = optional(bool)
+    node_public_ip_enabled        = optional(bool)
     subnet_resource_id            = optional(string)
     tags                          = optional(map(string))
     assign_to_user = optional(object({
@@ -44,40 +44,25 @@ EOT
       public_key = string
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.machine_learning_compute_instances : (
-        can(regex("^[a-zA-Z][a-zA-Z0-9-]{3,24}$", v.name))
-      )
-    ])
-    error_message = "It can include letters, digits and dashes. It must start with a letter, end with a letter or digit, and be between 3 and 24 characters in length."
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.machine_learning_compute_instances : (
-        v.assign_to_user == null || (v.assign_to_user.tenant_id == null || (can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", v.assign_to_user.tenant_id))))
-      )
-    ])
-    error_message = "must be a valid UUID"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.machine_learning_compute_instances : (
-        v.assign_to_user == null || (v.assign_to_user.object_id == null || (length(v.assign_to_user.object_id) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_machine_learning_compute_instance's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   condition: can(regex("^[a-zA-Z][a-zA-Z0-9-]{3,24}$", value))
+  #   message:   It can include letters, digits and dashes. It must start with a letter, end with a letter or digit, and be between 3 and 24 characters in length.
   # path: machine_learning_workspace_id
   #   source:    [from workspaces.ValidateWorkspaceID] !ok
   # path: machine_learning_workspace_id
   #   source:    [from workspaces.ValidateWorkspaceID] err != nil
   # path: authorization_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: assign_to_user.tenant_id
+  #   condition: can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", value))
+  #   message:   must be a valid UUID
+  # path: assign_to_user.object_id
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: identity.type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: identity.identity_ids[*]
